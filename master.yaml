@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1 # for versions before 1.7.0 use apps/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins-deployment
+  namespace: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      securityContext:
+          fsGroup: 1000
+      containers:
+      - name: jenkins
+        # image: bibinwilson/priveleged-jenkins
+        image: bibinwilson/jenkins
+        ports:
+        - containerPort: 8080
+      ### Mounting Jenkins Data directory to persistent Volume  
+        volumeMounts:
+              - name: jenkins-persistent-storage
+                mountPath: /var/jenkins_home
+      ###
+        
+
+      ### Definition for Persistent Volume Claim.
+      volumes:
+      - name: jenkins-persistent-storage
+        persistentVolumeClaim:
+           claimName: jenkins-data
+
+
+      
